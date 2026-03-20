@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(cmd /c \"node --version && npm --version\")",
+      "Bash(cmd /c node --version)",
+      "Bash(cmd /c npm --version)",
+      "Bash(powershell -Command \"node --version; npm --version\")",
+      "Bash(npm install:*)",
+      "Bash(powershell -Command \"Set-Location ''c:\\\\Users\\\\kkoss\\\\OneDrive\\\\바탕 화면\\\\프로젝트\\\\패턴조진놈''; npm install\")",
+      "Bash(xargs sed:*)"
+    ]
+  }
+}

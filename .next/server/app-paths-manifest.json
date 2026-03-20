@@ -1,0 +1,14 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/auth/signup/page": "app/auth/signup/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
+  "/community/page": "app/community/page.js",
+  "/challenge/page": "app/challenge/page.js",
+  "/blood-sugar/page": "app/blood-sugar/page.js",
+  "/my-challenge/page": "app/my-challenge/page.js",
+  "/news/page": "app/news/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/point-shop/page": "app/point-shop/page.js",
+  "/page": "app/page.js",
+  "/routines/page": "app/routines/page.js"
+}
