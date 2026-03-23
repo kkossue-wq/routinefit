@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
 
@@ -14,9 +14,6 @@ type BSEntry = {
   foodBreakfast?: string
   foodLunch?: string
   foodDinner?: string
-  photoBreakfast?: string   // base64
-  photoLunch?: string
-  photoDinner?: string
   memo?: string
 }
 
@@ -30,9 +27,6 @@ type WeightEntry = {
   foodBreakfast?: string
   foodLunch?: string
   foodDinner?: string
-  photoBreakfast?: string   // base64
-  photoLunch?: string
-  photoDinner?: string
   note?: string
 }
 
@@ -44,12 +38,6 @@ const MEASUREMENTS = [
   { id: 'bedtime',        label: '취침 전',   emoji: '😴', time: '취침 1시간 전',   isFasting: true,  hasFoodLog: false },
 ]
 
-// 혈당 ID → 사진 BSEntry 키 매핑
-const BS_PHOTO_KEY: Record<string, keyof BSEntry> = {
-  afterBreakfast: 'photoBreakfast',
-  afterLunch:     'photoLunch',
-  afterDinner:    'photoDinner',
-}
 
 function getBSStatus(value: number, isFasting: boolean) {
   if (isFasting) {
@@ -88,13 +76,6 @@ const MEAL_OPTIONS: { value: MealQuality; label: string; emoji: string; color: s
   { value: 'bad',  label: '아쉬웠어요', emoji: '😔', color: 'bg-red-50    border-red-300    text-red-700'    },
 ]
 
-function readFileAsBase64(file: File): Promise<string> {
-  return new Promise((resolve) => {
-    const reader = new FileReader()
-    reader.onload = (e) => resolve(e.target?.result as string)
-    reader.readAsDataURL(file)
-  })
-}
 
 function DateNav({ dateKey, isToday, onPrev, onNext }: {
   dateKey: string; isToday: boolean; onPrev: () => void; onNext: () => void
@@ -111,18 +92,6 @@ function DateNav({ dateKey, isToday, onPrev, onNext }: {
   )
 }
 
-// ── 사진 미리보기 / 삭제 컴포넌트 ─────────────────────────
-function PhotoThumb({ src, onDelete }: { src: string; onDelete: () => void }) {
-  return (
-    <div className="relative mt-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="식사 사진" className="w-full h-36 object-cover rounded-2xl" />
-      <button onClick={onDelete}
-        className="absolute top-1.5 right-1.5 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
-      >×</button>
-    </div>
-  )
-}
 
 export default function BloodSugarPage() {
   const [activeTab, setActiveTab] = useState<'blood' | 'weight'>('blood')
@@ -130,7 +99,6 @@ export default function BloodSugarPage() {
   // ── 혈당 상태 ────────────────────────────────────────────
   const [bsOffset, setBsOffset]         = useState(0)
   const [bsInputs, setBsInputs]         = useState<Record<string, string>>({})
-  const [bsPhotos, setBsPhotos]         = useState<Record<string, string>>({})  // photo_afterBreakfast 등
   const [bsSaved, setBsSaved]           = useState(false)
   const [bsHistory, setBsHistory]       = useState<Record<string, BSEntry>>({})
   const [expandedFood, setExpandedFood] = useState<string | null>(null)
@@ -140,7 +108,6 @@ export default function BloodSugarPage() {
   const [weightInput, setWeightInput]   = useState('')
   const [meals, setMeals]               = useState<Record<string, MealQuality | undefined>>({})
   const [mealFoods, setMealFoods]       = useState<Record<string, string>>({})    // 아침/점심/저녁 식사 내용
-  const [mealPhotos, setMealPhotos]     = useState<Record<string, string>>({})    // 아침/점심/저녁 식사 사진
   const [weightNote, setWeightNote]     = useState('')
   const [wSaved, setWSaved]             = useState(false)
   const [wHistory, setWHistory]         = useState<Record<string, WeightEntry>>({})
@@ -148,9 +115,6 @@ export default function BloodSugarPage() {
   const [targetWeight, setTargetWeight] = useState('')
   const [showSetup, setShowSetup]       = useState(false)
 
-  // ── 사진 입력 ref (공용) ──────────────────────────────────
-  const photoInputRef  = useRef<HTMLInputElement>(null)
-  const [photoTarget, setPhotoTarget] = useState<string | null>(null) // 어느 항목의 사진인지
 
   const bsDateKey = getDateKey(bsOffset)
   const wDateKey  = getDateKey(wOffset)
@@ -191,14 +155,8 @@ export default function BloodSugarPage() {
       if (p.foodDinner)    ni['food_afterDinner']    = p.foodDinner
       if (p.memo)          ni['memo']                = p.memo
       setBsInputs(ni)
-      // 사진 복원
-      const ph: Record<string, string> = {}
-      if (p.photoBreakfast) ph['photo_afterBreakfast'] = p.photoBreakfast
-      if (p.photoLunch)     ph['photo_afterLunch']     = p.photoLunch
-      if (p.photoDinner)    ph['photo_afterDinner']    = p.photoDinner
-      setBsPhotos(ph)
     } else {
-      setBsInputs({}); setBsPhotos({})
+      setBsInputs({})
     }
     setBsSaved(false); setExpandedFood(null); loadBsHistory()
   }, [bsDateKey])
@@ -214,14 +172,9 @@ export default function BloodSugarPage() {
         lunch:     p.foodLunch     ?? '',
         dinner:    p.foodDinner    ?? '',
       })
-      const ph: Record<string, string> = {}
-      if (p.photoBreakfast) ph.breakfast = p.photoBreakfast
-      if (p.photoLunch)     ph.lunch     = p.photoLunch
-      if (p.photoDinner)    ph.dinner    = p.photoDinner
-      setMealPhotos(ph)
       setWeightNote(p.note ?? '')
     } else {
-      setWeightInput(''); setMeals({}); setMealFoods({}); setMealPhotos({}); setWeightNote('')
+      setWeightInput(''); setMeals({}); setMealFoods({}); setWeightNote('')
     }
     setWSaved(false); loadWHistory()
   }, [wDateKey])
@@ -233,27 +186,6 @@ export default function BloodSugarPage() {
     if (tw) setTargetWeight(tw)
   }, [])
 
-  // ── 사진 캡처 공통 핸들러 ─────────────────────────────────
-  const openPhotoCapture = (target: string) => {
-    setPhotoTarget(target)
-    setTimeout(() => photoInputRef.current?.click(), 50)
-  }
-
-  const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !photoTarget) return
-    const base64 = await readFileAsBase64(file)
-    e.target.value = '' // reset
-    if (photoTarget.startsWith('bs_')) {
-      const key = photoTarget.replace('bs_', '')
-      setBsPhotos((prev) => ({ ...prev, [key]: base64 }))
-    } else if (photoTarget.startsWith('w_')) {
-      const key = photoTarget.replace('w_', '')
-      setMealPhotos((prev) => ({ ...prev, [key]: base64 }))
-    }
-    setPhotoTarget(null)
-  }
-
   // ── 혈당 저장 ─────────────────────────────────────────────
   const saveBs = () => {
     const entry: Record<string, unknown> = {}
@@ -264,9 +196,6 @@ export default function BloodSugarPage() {
     if (bsInputs['food_afterBreakfast']) entry.foodBreakfast = bsInputs['food_afterBreakfast']
     if (bsInputs['food_afterLunch'])     entry.foodLunch     = bsInputs['food_afterLunch']
     if (bsInputs['food_afterDinner'])    entry.foodDinner    = bsInputs['food_afterDinner']
-    if (bsPhotos['photo_afterBreakfast']) entry.photoBreakfast = bsPhotos['photo_afterBreakfast']
-    if (bsPhotos['photo_afterLunch'])     entry.photoLunch     = bsPhotos['photo_afterLunch']
-    if (bsPhotos['photo_afterDinner'])    entry.photoDinner    = bsPhotos['photo_afterDinner']
     if (bsInputs.memo) entry.memo = bsInputs.memo
     try {
       localStorage.setItem(`blood_sugar_${bsDateKey}`, JSON.stringify(entry))
@@ -286,9 +215,6 @@ export default function BloodSugarPage() {
     if (mealFoods.breakfast) entry.foodBreakfast = mealFoods.breakfast
     if (mealFoods.lunch)     entry.foodLunch     = mealFoods.lunch
     if (mealFoods.dinner)    entry.foodDinner    = mealFoods.dinner
-    if (mealPhotos.breakfast) entry.photoBreakfast = mealPhotos.breakfast
-    if (mealPhotos.lunch)     entry.photoLunch     = mealPhotos.lunch
-    if (mealPhotos.dinner)    entry.photoDinner    = mealPhotos.dinner
     if (weightNote) entry.note = weightNote
     try {
       localStorage.setItem(`weight_${wDateKey}`, JSON.stringify(entry))
@@ -326,10 +252,6 @@ export default function BloodSugarPage() {
   return (
     <div className="min-h-screen bg-gray-100 pb-28">
       <Header title="건강 기록" />
-
-      {/* 공용 사진 파일 인풋 */}
-      <input ref={photoInputRef} type="file" accept="image/*" capture="environment"
-        className="hidden" onChange={handlePhotoCapture} />
 
       {/* 탭 */}
       <div className="flex bg-white border-b-2 border-lemon-100">
@@ -388,8 +310,6 @@ export default function BloodSugarPage() {
               const status   = val && val > 0 ? getBSStatus(val, m.isFasting) : null
               const foodKey  = `food_${m.id}`
               const foodVal  = bsInputs[foodKey] ?? ''
-              const photoKey = `photo_${m.id}`
-              const photoSrc = bsPhotos[photoKey]
               const isExpanded = expandedFood === m.id
 
               return (
@@ -439,10 +359,9 @@ export default function BloodSugarPage() {
                            m.id === 'afterLunch'     ? '점심 식사 기록' : '저녁 식사 기록'}
                         </span>
                         {/* 입력 내용 요약 */}
-                        {(foodVal || photoSrc) && !isExpanded && (
+                        {foodVal && !isExpanded && (
                           <span className="ml-auto flex items-center gap-1 text-gray-500">
-                            {photoSrc && <span>📷</span>}
-                            {foodVal && <span className="truncate max-w-[100px]">{foodVal}</span>}
+                            <span className="truncate max-w-[100px]">{foodVal}</span>
                           </span>
                         )}
                         <span className={`ml-auto transition-transform ${isExpanded ? 'rotate-180' : ''}`}>▾</span>
@@ -478,19 +397,6 @@ export default function BloodSugarPage() {
                             </div>
                           </div>
 
-                          {/* 사진 영역 */}
-                          {photoSrc ? (
-                            <PhotoThumb src={photoSrc} onDelete={() =>
-                              setBsPhotos((prev) => { const n = { ...prev }; delete n[photoKey]; return n })
-                            } />
-                          ) : (
-                            <button
-                              onClick={() => openPhotoCapture(`bs_${photoKey}`)}
-                              className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed border-lemon-300 rounded-2xl text-xs font-bold text-gray-500 bg-white active:bg-lemon-50"
-                            >
-                              <span>📷</span> 식사 사진 찍기
-                            </button>
-                          )}
                         </div>
                       )}
                     </div>
@@ -539,8 +445,6 @@ export default function BloodSugarPage() {
                     entry.foodLunch     && `점심: ${entry.foodLunch}`,
                     entry.foodDinner    && `저녁: ${entry.foodDinner}`,
                   ].filter(Boolean)
-                  const hasPhotos = entry.photoBreakfast || entry.photoLunch || entry.photoDinner
-
                   return (
                     <div key={date} className={`bg-white rounded-2xl px-4 py-3 border-2 shadow-cute ${
                       status ? status.bg : 'border-lemon-100'
@@ -548,7 +452,7 @@ export default function BloodSugarPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0 pr-3">
                           <p className="font-black text-sm text-gray-700">{formatDate(date)}</p>
-                          <p className="text-xs text-gray-500">{count}개 항목{hasPhotos ? ' · 📷 사진' : ''}</p>
+                          <p className="text-xs text-gray-500">{count}개 항목</p>
                           {foods.length > 0 && <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">🍽️ {foods.join(' · ')}</p>}
                           {entry.memo && <p className="text-xs text-gray-500 truncate mt-0.5">📝 {entry.memo}</p>}
                         </div>
@@ -699,19 +603,6 @@ export default function BloodSugarPage() {
                     className="w-full border-2 border-lemon-200 rounded-xl px-3 py-2 text-xs text-gray-700 focus:border-lemon-400 focus:outline-none mb-2"
                   />
 
-                  {/* 식사 사진 */}
-                  {mealPhotos[meal.key] ? (
-                    <PhotoThumb src={mealPhotos[meal.key]}
-                      onDelete={() => setMealPhotos((prev) => { const n = { ...prev }; delete n[meal.key]; return n })}
-                    />
-                  ) : (
-                    <button
-                      onClick={() => openPhotoCapture(`w_${meal.key}`)}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 border-2 border-dashed border-lemon-300 rounded-xl text-xs font-bold text-gray-500 active:bg-lemon-50"
-                    >
-                      <span>📷</span> {meal.label} 사진 찍기
-                    </button>
-                  )}
                 </div>
               ))}
             </div>
@@ -748,12 +639,11 @@ export default function BloodSugarPage() {
                       entry.mealLunch     && MEAL_OPTIONS.find(o => o.value === entry.mealLunch)?.emoji,
                       entry.mealDinner    && MEAL_OPTIONS.find(o => o.value === entry.mealDinner)?.emoji,
                     ].filter(Boolean)
-                    const hasPhotos = entry.photoBreakfast || entry.photoLunch || entry.photoDinner
                     return (
                       <div key={date} className="bg-white rounded-2xl px-4 py-3 border-2 border-lemon-100 shadow-cute flex items-center justify-between">
                         <div>
                           <p className="font-black text-sm text-gray-700">{formatDate(date)}</p>
-                          {moodRow.length > 0 && <p className="text-sm mt-0.5">{moodRow.join(' ')}{hasPhotos ? ' 📷' : ''}</p>}
+                          {moodRow.length > 0 && <p className="text-sm mt-0.5">{moodRow.join(' ')}</p>}
                           {entry.note && <p className="text-xs text-gray-500 truncate max-w-[160px] mt-0.5">📝 {entry.note}</p>}
                         </div>
                         <div className="text-right">
