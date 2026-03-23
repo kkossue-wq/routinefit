@@ -137,7 +137,7 @@ export default function ProfilePage() {
       <Header title="내 프로필" />
 
       {/* 프로필 배너 */}
-      <div className="bg-gradient-to-br from-lemon-400 to-amber-300 px-4 pt-6 pb-10 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-lemon-400 to-amber-300 px-4 pt-6 pb-6 relative overflow-hidden">
         <div className="shimmer absolute inset-0" />
         <div className="relative flex items-center gap-4">
           <div className="relative">
@@ -183,7 +183,7 @@ export default function ProfilePage() {
       </div>
 
       {/* 통계 카드 */}
-      <div className="px-4 -mt-5">
+      <div className="px-4 mt-4">
         <div className="bg-white rounded-3xl p-4 shadow-cute-lg border-2 border-lemon-100">
           <div className="grid grid-cols-3 gap-2 mb-3">
             {[
