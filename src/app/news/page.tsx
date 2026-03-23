@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
 import { healthProducts } from '@/lib/data'
-import { getTodayHealthNews, getTodayEcoNews, getWeeklyHealthNews, type NewsArticle } from '@/lib/newsContent'
+import { getTodayHealthNews, getWeeklyHealthNews, type NewsArticle } from '@/lib/newsContent'
 
 const subTabs = [
   { id: 'health',  label: '건강 정보', icon: '🌿' },
   { id: 'shop',    label: '건강 제품', icon: '🛍️' },
-  { id: 'eco',     label: '경제 뉴스', icon: '📈' },
   { id: 'archive', label: '지난 기사', icon: '📂' },
 ]
 
@@ -58,12 +57,10 @@ export default function HealthPage() {
   const [activeTab, setActiveTab] = useState('health')
   const [saved, setSaved] = useState<string[]>([])
   const [todayHealth, setTodayHealth] = useState<NewsArticle[]>([])
-  const [todayEco, setTodayEco] = useState<NewsArticle[]>([])
   const [archive, setArchive] = useState<NewsArticle[]>([])
 
   useEffect(() => {
     setTodayHealth(getTodayHealthNews())
-    setTodayEco(getTodayEcoNews())
     setArchive(getWeeklyHealthNews())
     const savedIds = JSON.parse(localStorage.getItem('saved_articles') ?? '[]')
     setSaved(savedIds)
@@ -81,6 +78,7 @@ export default function HealthPage() {
 
       {/* 페이지 헤더 */}
       <div className="bg-lemon-400 px-4 py-4 relative overflow-hidden">
+        <div className="shimmer absolute inset-0" />
         <div className="absolute -top-6 -right-6 w-28 h-28 bg-black/5 rounded-full" />
         <div className="relative flex items-center justify-between">
           <div>
@@ -95,37 +93,10 @@ export default function HealthPage() {
         </div>
       </div>
 
-      {/* 탭 — 건강(정보·제품) | 구분선 | 경제·지난기사 */}
+      {/* 탭 */}
       <div className="bg-white border-b border-gray-100">
-        {/* 카테고리 안내 — 탭 위 */}
-        <div className="flex text-center pt-1.5">
-          <p className="flex-1 text-[10px] text-mint-600 font-bold">건강·웰니스</p>
-          <div className="w-px" />
-          <p className="flex-1 text-[10px] text-gray-500 font-bold">정보·경제</p>
-        </div>
-
         <div className="flex">
-          {/* 건강 그룹 */}
-          {subTabs.slice(0, 2).map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1 py-3 text-xs font-bold transition-all border-b-2 ${
-                activeTab === tab.id
-                  ? 'border-gray-900 text-gray-900'
-                  : 'border-transparent text-gray-500'
-              }`}
-            >
-              <span>{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-
-          {/* 구분선 */}
-          <div className="w-px bg-gray-100 my-2" />
-
-          {/* 경제·아카이브 그룹 */}
-          {subTabs.slice(2).map((tab) => (
+          {subTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -224,29 +195,6 @@ export default function HealthPage() {
           <p className="text-gray-500 text-xs text-center mt-4 leading-relaxed">
             위 제품은 건강 정보 참고용입니다.<br />구매 전 전문 의료인과 상담하세요.
           </p>
-        </div>
-      )}
-
-      {/* 경제 뉴스 — 건강 탭과 완전히 분리된 영역 */}
-      {activeTab === 'eco' && (
-        <div className="px-4 pt-4 space-y-3 pb-4">
-          <div className="bg-gray-900 rounded-2xl p-4 mb-2">
-            <p className="text-lemon-400 text-xs font-black mb-1">경제 뉴스</p>
-            <p className="text-white font-black text-sm">건강과 내 지갑을 함께 챙겨요</p>
-            <p className="text-white/50 text-xs mt-1">건강 관련 경제·금융 정보를 매일 업데이트해요</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-4 bg-gray-600 rounded-full" />
-            <p className="text-xs font-black text-gray-500 uppercase tracking-wide">오늘의 경제 뉴스</p>
-          </div>
-          {todayEco.map((a) => (
-            <ArticleCard key={a.id} article={a} saved={saved.includes(a.id)} onSave={() => toggleSave(a.id)} />
-          ))}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
-            <p className="text-2xl mb-2">📈</p>
-            <p className="font-bold text-gray-700 text-sm">더 많은 경제 뉴스</p>
-            <p className="text-xs text-gray-500 mt-1">Phase 3에서 실시간 경제 뉴스가 자동으로 업데이트돼요</p>
-          </div>
         </div>
       )}
 

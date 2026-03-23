@@ -415,6 +415,7 @@ export default function MyChallengePage() {
 
       {/* 상단 배너 */}
       <div className="bg-gradient-to-r from-sky-400 to-sky-500 px-4 py-5 relative overflow-hidden">
+        <div className="shimmer absolute inset-0" />
         <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full" />
         <div className="relative flex items-center justify-between">
           <div>

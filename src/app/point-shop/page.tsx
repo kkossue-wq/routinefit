@@ -28,6 +28,7 @@ export default function PointShopPage() {
 
       {/* 히어로 */}
       <div className="bg-gradient-to-br from-amber-400 via-lemon-400 to-yellow-300 px-4 py-6 relative overflow-hidden">
+        <div className="shimmer absolute inset-0" />
         <div className="absolute -top-10 -right-10 w-44 h-44 bg-white/10 rounded-full" />
         <div className="absolute -bottom-8 -left-6 w-32 h-32 bg-black/5 rounded-full" />
         <div className="relative">

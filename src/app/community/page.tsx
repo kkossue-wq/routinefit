@@ -220,20 +220,23 @@ export default function CommunityPage() {
       <Header title="루틴 커뮤니티" />
 
       {/* 헤더 배너 */}
-      <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 px-4 py-4">
-        <h2 className="text-white font-bold text-lg">👥 오늘의 루틴 인증</h2>
-        <p className="text-white/80 text-xs mt-1">서로의 건강 루틴을 응원해요!</p>
-        <div className="mt-3 flex gap-3">
-          {[
-            { label: '오늘 인증', value: `${posts.length}명` },
-            { label: '이번 주', value: '312명' },
-            { label: '전체 회원', value: '1,204명' },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-white/30 rounded-xl px-3 py-1.5 text-center">
-              <p className="text-white font-bold text-sm">{stat.value}</p>
-              <p className="text-white/80 text-xs">{stat.label}</p>
-            </div>
-          ))}
+      <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 px-4 py-4 relative overflow-hidden">
+        <div className="shimmer absolute inset-0" />
+        <div className="relative">
+          <h2 className="text-white font-bold text-lg">👥 오늘의 루틴 인증</h2>
+          <p className="text-white/80 text-xs mt-1">서로의 건강 루틴을 응원해요!</p>
+          <div className="mt-3 flex gap-3">
+            {[
+              { label: '오늘 인증', value: `${posts.length}명` },
+              { label: '이번 주', value: '312명' },
+              { label: '전체 회원', value: '1,204명' },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-white/30 rounded-xl px-3 py-1.5 text-center">
+                <p className="text-white font-bold text-sm">{stat.value}</p>
+                <p className="text-white/80 text-xs">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

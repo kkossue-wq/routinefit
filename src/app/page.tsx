@@ -563,6 +563,7 @@ export default function HomePage() {
 
       {/* 히어로 */}
       <div className="bg-lemon-400 px-4 pt-5 pb-6 relative overflow-hidden">
+        <div className="shimmer absolute inset-0" />
 
         {/* 날짜 + 인사 + 응원 메시지 */}
         <div className="relative">

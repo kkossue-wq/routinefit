@@ -586,6 +586,7 @@ export default function BloodSugarPage() {
       {activeTab === 'weight' && (
         <>
           <div className="bg-gradient-to-r from-lemon-400 to-lemon-300 px-4 py-4 relative overflow-hidden">
+            <div className="shimmer absolute inset-0" />
             <div className="relative flex items-center justify-between">
               <div>
                 <h2 className="text-gray-900 font-black text-lg">⚖️ 체중 &amp; 다이어트</h2>
