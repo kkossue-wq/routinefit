@@ -3,12 +3,10 @@
 import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
-import { healthProducts } from '@/lib/data'
 import { getTodayHealthNews, getWeeklyHealthNews, type NewsArticle } from '@/lib/newsContent'
 
 const subTabs = [
   { id: 'health',  label: '건강 정보', icon: '🌿' },
-  { id: 'shop',    label: '건강 제품', icon: '🛍️' },
   { id: 'archive', label: '지난 기사', icon: '📂' },
 ]
 
@@ -148,55 +146,7 @@ export default function HealthPage() {
         </div>
       )}
 
-      {/* 건강 제품 */}
-      {activeTab === 'shop' && (
-        <div className="px-4 pt-4 pb-4">
-          <div className="bg-mint-50 rounded-xl px-4 py-3 mb-4 border border-mint-100 flex items-center gap-2">
-            <span>🛍️</span>
-            <p className="text-gray-600 text-xs font-medium">
-              루틴핏이 검토한 건강 보조제만 추천해요
-            </p>
-          </div>
-          <div className="space-y-3">
-            {healthProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-2xl p-4 shadow-card border border-gray-100">
-                <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 border border-gray-100">
-                    {product.emoji}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-xs bg-lemon-100 text-lemon-700 font-bold px-2 py-0.5 rounded-full">
-                          {product.tag}
-                        </span>
-                        <h3 className="font-black text-gray-800 mt-1 text-sm">{product.name}</h3>
-                      </div>
-                      <p className="text-xs text-gray-500 font-bold">{product.price}</p>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{product.description}</p>
-                    <div className="flex items-center gap-1.5 mt-1.5">
-                      <span className="text-yellow-400 text-xs">{'⭐'.repeat(Math.round(product.rating))}</span>
-                      <span className="text-xs text-gray-500">
-                        {product.rating} ({product.reviews.toLocaleString()}명)
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => alert('제휴 링크는 Phase 4에서 연결됩니다!')}
-                  className="mt-3 w-full bg-lemon-400 text-gray-900 font-black py-2.5 rounded-xl text-sm"
-                >
-                  최저가 확인하기
-                </button>
-              </div>
-            ))}
-          </div>
-          <p className="text-gray-500 text-xs text-center mt-4 leading-relaxed">
-            위 제품은 건강 정보 참고용입니다.<br />구매 전 전문 의료인과 상담하세요.
-          </p>
-        </div>
-      )}
+
 
       {/* 지난 기사 */}
       {activeTab === 'archive' && (
